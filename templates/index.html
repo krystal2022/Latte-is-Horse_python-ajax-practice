@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+
+    <title>라떼 맛집 리스트</title>
+
+    <style>
+        * {
+            font-family: 'Gowun Batang', serif;
+            color: white;
+        }
+
+        body {
+            background-image: url(/static/coffee.jpg);
+            background-size: cover;
+            background-position: top;
+            background-repeat: no-repeat;
+            background-color: #000;
+        }
+
+        h1 {
+            font-weight: bold;
+        }
+
+        .wrapper {
+            position: absolute;
+            height:100%;
+            width: 100%;
+            margin: 60px auto 0px auto;
+            padding-bottom: 60px;
+            display: flex;
+            align-content: center;
+            justify-content: center;
+        }
+
+        .mybtn {
+            width: 100%;
+        }
+
+        .cafes {
+            position: absolute;
+            left:100px;
+            margin-right: 50px;
+        }
+
+        .cafes > table thead{
+            font-size: 14px;
+        }
+        .cafes > table tbody{
+            font-size: 18px;
+        }
+        .cafes > table tbody td:nth-of-type(1){
+            color: lightyellow;
+        }
+        .cafes > table tbody td:nth-of-type(4){
+            font-size: 16px;
+        }
+
+        .record {
+            position: fixed;
+            right:100px;
+            margin-left: 50px;
+        }
+
+        .record h4 > span {
+            background: linear-gradient(to top, saddlebrown 50%, transparent 50%);
+
+        }
+
+        option {
+            color: black;
+        }
+    </style>
+    <script>
+        $(document).ready(function () {
+            show_cafe();
+        });
+
+        function show_cafe() {
+            $.ajax({
+                type: 'GET',
+                url: '/latte',
+                data: {},
+                success: function (response) {
+                    let rows = response['latte']
+                    for(let i=0; i<rows.length; i++){
+                        let name = rows[i]['name']
+                        let loca = rows[i]['loca']
+                        let address = rows[i]['address']
+                        let tag = rows[i]['tag']
+
+                        let temp_html = `<tr>
+                                            <td>${name}</td>
+                                            <td>${loca}</td>
+                                            <td>${address}</td>
+                                            <td>${tag}</td>
+                                        </tr>`
+
+                        $('#cafe-list').append(temp_html)
+                    }
+                }
+            });
+        }
+
+        function save_cafe() {
+            let name = $('#name').val()
+            let loca = $('#loca').val()
+            let address = $('#address').val()
+            let tag = $('#tag').val()
+
+            $.ajax({
+                type: 'POST',
+                url: '/latte',
+                data: {name_give: name, loca_give:loca, address_give:address, tag_give:tag},
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload()
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="mask"></div>
+<div class="wrapper">
+    <div class="cafes">
+        <table class="table">
+            <thead>
+            <tr class="category">
+                <th scope="col">카페 이름</th>
+                <th scope="col">지역</th>
+                <th scope="col">상세 주소</th>
+                <th scope="col">태그</th>
+            </tr>
+            </thead>
+            <tbody id="cafe-list">
+
+
+            </tbody>
+        </table>
+    </div>
+    <div class="record">
+        <h1>라떼는 말이야!</h1>
+        <h4><span>고소한 라떼</span>를 좋아하는 서울러의 카페리스트</h4><br>
+        <div class="order-info">
+            <div class="input-group mb-3">
+                <span class="input-group-text">카페 이름</span>
+                <input id="name" type="text" class="form-control">
+            </div>
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="loca">지역</label>
+                <select class="form-select" id="loca">
+                    <option selected>-- 지역 선택하기 --</option>
+                    <option value="서울">서울</option>
+                    <option value="경기">경기</option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">상세 주소</span>
+                <input id="address" type="text" class="form-control">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">태그</span>
+                <input id="tag" type="text" class="form-control">
+            </div>
+            <button onclick="save_cafe()" type="button" class="btn btn-warning mybtn">저장하기</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
